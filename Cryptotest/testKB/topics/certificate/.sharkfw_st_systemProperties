@@ -1,0 +1,4 @@
+ST_class:	SN_TX_ST
+SemanticTag_Name:	certificate
+SemanticTag_SIs:	|s|cc:certificate|/s|
+AbstractST_hidden:	false

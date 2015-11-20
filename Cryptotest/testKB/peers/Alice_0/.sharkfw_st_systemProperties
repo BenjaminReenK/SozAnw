@@ -1,0 +1,5 @@
+PeerST_Addresses:	|s||/s|
+ST_class:	SN_TX_PST
+SemanticTag_Name:	Alice
+SemanticTag_SIs:	|s|http://www.sharksystem.net/alice.html|/s|
+AbstractST_hidden:	false
