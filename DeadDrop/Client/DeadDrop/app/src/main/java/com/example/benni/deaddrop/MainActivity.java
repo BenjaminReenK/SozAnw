@@ -1,6 +1,9 @@
 package com.example.benni.deaddrop;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -56,9 +59,11 @@ public class MainActivity extends AppCompatActivity
     private FSSharkKB kb;
     private PeerSemanticTag ownPeerTag;
     private WifiListenerKp wifiKP;
-    private final String kbName = "testKB";
+    private String appDir;
 
+    public static final String KBNAME = "testKB";
     public static final String T_ADD_CONTACTS = "TAG_ADD_CONTACTS";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,19 +80,28 @@ public class MainActivity extends AppCompatActivity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
+        // extract Username and mail for Peer
+        Intent intent = getIntent();
+        String nickName = intent.getStringExtra(IdentityActivity.EXTRANAME);
+        String email = intent.getStringExtra(IdentityActivity.EXTRAMAIL);
+
         // Create SharkEngine
         sharkEngine = new AndroidSharkEngine(this);
 
+        // Get AppDir
+        File aDir = getFilesDir();
+        appDir = aDir.getPath() + "/";
+
+
 
         try {
-            // Get AppDir
-            File t = getFilesDir();
+
 
             // Create Knowledgebase
-            kb = new FSSharkKB(t.getPath() + "/" + kbName);
-
+            kb = new FSSharkKB(appDir + KBNAME);
+          
             // Create own peertag
-            ownPeerTag = kb.createPeerSemanticTag("Blubkeks", "myIdentity", "AdressPlaceHolder");
+            ownPeerTag = kb.createPeerSemanticTag(nickName, email, "AdressPlaceHolder");
 
             STSet addContactsTopic = kb.createInMemoSTSet();
             addContactsTopic.createSemanticTag(T_ADD_CONTACTS, "http://blub.de");
@@ -157,6 +171,14 @@ public class MainActivity extends AppCompatActivity
                         .replace(R.id.container, logFragment)
                         .commit();
                 break;
+
+            // Settings
+            case 3:
+                SettingsFragment settingsFragment = new SettingsFragment();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, settingsFragment)
+                        .commit();
+                break;
         }
     }
 
@@ -206,6 +228,14 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         sharkEngine.stop();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+
     }
 }
 

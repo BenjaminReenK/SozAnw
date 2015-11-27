@@ -53,8 +53,8 @@ public class WifiListenerKp extends KnowledgePort {
 
 
 
-        //this.myInterest = new InMemoSharkKB().createInterest(null, myIdentity, null, null, null, null, SharkCS.DIRECTION_INOUT);
-        this.myInterest = getInterest();
+        this.myInterest = new InMemoSharkKB().createInterest(null, myIdentity, null, null, null, null, SharkCS.DIRECTION_INOUT);
+        //this.myInterest = getInterest();
     }
 
     @Override
@@ -67,6 +67,7 @@ public class WifiListenerKp extends KnowledgePort {
 
     @Override
     protected void doExpose(SharkCS interest, KEPConnection kepConnection) {
+
 
         //MainActivity.log("interest received " + L.contextSpace2String(interest));
         if (isAnyInterest(interest)) {

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+
+        <!-- Name -->
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:descendantFocusability="blocksDescendants"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp">
+
+            <!-- Name Label -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/contactsName"
+                android:id="@+id/tv_contacts_name_label"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"/>
+            <!-- Name Value -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Name Value"
+                android:id="@+id/tv_contacts_name_value"
+                android:layout_weight="2.5"/>
+
+        </LinearLayout>
+
+        <!-- Fingerprint -->
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:descendantFocusability="blocksDescendants"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp">
+
+            <!-- Fingerprint Label -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/contactsFingerprint"
+                android:id="@+id/tv_contacts_fp_label"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"/>
+
+            <!-- Fingerprint Value -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Fingerprint Value"
+                android:id="@+id/tv_contacts_fp_value"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="2.5"/>
+
+        </LinearLayout>
+
+
+
+
+
+
+</LinearLayout>
