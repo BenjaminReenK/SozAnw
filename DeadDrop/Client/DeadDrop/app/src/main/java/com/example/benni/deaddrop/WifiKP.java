@@ -2,6 +2,8 @@ package com.example.benni.deaddrop;
 
 
 
+import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,24 +39,28 @@ import net.sharkfw.system.SharkException;
  *
  * @author jgig
  */
-public class WifiListenerKp extends KnowledgePort {
+public class WifiKP extends KnowledgePort {
     private SharkCS myInterest;
+    private SharkCS contactInterest;
     private ConnectionListener connectionListener;
 
+    public static final String CONTACTREQ_TOPIC_SI = "CONTACTREQ";
 
 
     /**
      * @param se       the shark engine
      */
-    public WifiListenerKp(SharkEngine se, PeerSemanticTag myIdentity, SharkKB kb) throws SharkKBException {
+    public WifiKP(SharkEngine se, PeerSemanticTag myIdentity, SharkKB kb) throws SharkKBException {
         super(se);
 
         this.kb = kb;
-
-
-
         this.myInterest = new InMemoSharkKB().createInterest(null, myIdentity, null, null, null, null, SharkCS.DIRECTION_INOUT);
         //this.myInterest = getInterest();
+
+       /* STSet topics = InMemoSharkKB.createInMemoSTSet();
+        SemanticTag contactReq = InMemoSharkKB.createInMemoSemanticTag("stname", MainActivity.T_ADD_CONTACTS);
+        topics.merge(contactReq);
+        contactInterest = new InMemoSharkKB().createInterest(topics, myIdentity, null, null, null, null, SharkCS.DIRECTION_INOUT);*/
     }
 
     @Override
@@ -69,20 +75,25 @@ public class WifiListenerKp extends KnowledgePort {
     protected void doExpose(SharkCS interest, KEPConnection kepConnection) {
 
 
-        //MainActivity.log("interest received " + L.contextSpace2String(interest));
+        MainActivity.log("interest received " + L.contextSpace2String(interest), KbTextViewWriter.LOG_CON);
         if (isAnyInterest(interest)) {
             Log.d("WifiKp", "any interest");
-            //MainActivity.log("any interest received " + L.contextSpace2String(interest));
+            MainActivity.log("any interest received " + L.contextSpace2String(interest), KbTextViewWriter.LOG_CON);
+
             try {
-                //MainActivity.log("WifiListenerKp - trying to send interest\n" + L.contextSpace2String(myInterest));
+                MainActivity.log("WifiListenerKp - trying to send interest\n" + L.contextSpace2String(myInterest), KbTextViewWriter.LOG_CON);
                 kepConnection.expose(myInterest);
+
             } catch (SharkException ex) {
-                //MainActivity.log("WifiListenerKp - problems:" + ex.getMessage());
+                MainActivity.log("WifiListenerKp - problems:" + ex.getMessage(), KbTextViewWriter.LOG_CON);
             }
-        } if (isPeerInterest(interest)){
-            //MainActivity.log("Peer Interest received");
-            //MainActivity.log("Peer interest received " + L.contextSpace2String(interest));
+        }
+        if (isPeerInterest(interest)){
+            MainActivity.log("Peer interest received " + L.contextSpace2String(interest), KbTextViewWriter.LOG_CON);
             connectionListener.onConnectionEstablished(kepConnection);
+        }
+        else if (isContactInterest(interest)) {
+            MainActivity.log("contact interest received " + L.contextSpace2String(interest), KbTextViewWriter.LOG_CON);
         }
 
     }
@@ -104,6 +115,25 @@ public class WifiListenerKp extends KnowledgePort {
                 theInterest.isAny(SharkCS.DIM_LOCATION) && theInterest.isAny(SharkCS.DIM_DIRECTION) &&
                 theInterest.isAny(SharkCS.DIM_PEER) && theInterest.isAny(SharkCS.DIM_REMOTEPEER) &&
                 theInterest.isAny(SharkCS.DIM_TIME)) ;
+    }
+
+    private boolean isContactInterest(SharkCS theInterest) {
+        STSet topics = null;
+        try {
+            topics = theInterest.getSTSet(0);
+            //SemanticTag blub = topics.getSemanticTag(MainActivity.T_ADD_CONTACTS);
+            //String[] blub1 = blub.getSI();
+        } catch (SharkKBException e) {
+            e.printStackTrace();
+        }
+
+
+/*
+        return (theInterest.getTopics(SharkCS.DIM_TOPIC) && !theInterest.isAny(SharkCS.DIM_ORIGINATOR) &&
+                theInterest.isAny(SharkCS.DIM_LOCATION) && theInterest.isAny(SharkCS.DIM_DIRECTION) &&
+                theInterest.isAny(SharkCS.DIM_PEER) && theInterest.isAny(SharkCS.DIM_REMOTEPEER) &&
+                theInterest.isAny(SharkCS.DIM_TIME)) ;*/
+        return false;
     }
 }
 

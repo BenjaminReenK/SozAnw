@@ -3,6 +3,9 @@ package com.example.benni.deaddrop;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
@@ -25,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import net.sharkfw.kep.SharkProtocolNotSupportedException;
 import net.sharkfw.knowledgeBase.Interest;
 import net.sharkfw.knowledgeBase.PeerSemanticTag;
 import net.sharkfw.knowledgeBase.STSet;
@@ -41,8 +45,7 @@ import net.sharkfw.system.SharkException;
 import java.io.File;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks,
-                    ConnectionListener {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -55,14 +58,18 @@ public class MainActivity extends AppCompatActivity
     private CharSequence mTitle;
 
 
-    private SharkEngine sharkEngine;
+    /*private CustomAndroidSharkEngine sharkEngine;
     private FSSharkKB kb;
     private PeerSemanticTag ownPeerTag;
-    private WifiListenerKp wifiKP;
+    private WifiListenerKp wifiKP;*/
     private String appDir;
+    public static Handler handler;
+    private KbTextViewWriter logger;
+    private WifiPeer wifiPeer;
 
     public static final String KBNAME = "testKB";
-    public static final String T_ADD_CONTACTS = "TAG_ADD_CONTACTS";
+    public static final String KBPATH = "kbstorage/";
+
 
 
     @Override
@@ -80,60 +87,36 @@ public class MainActivity extends AppCompatActivity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
+        // handler for logging function
+        handler = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(Message inputMsg) {
+                super.handleMessage(inputMsg);
+                logger.appendToKbText((String) inputMsg.obj);
+            }
+        };
+
+        logger = KbTextViewWriter.getInstance();
+
         // extract Username and mail for Peer
         Intent intent = getIntent();
         String nickName = intent.getStringExtra(IdentityActivity.EXTRANAME);
         String email = intent.getStringExtra(IdentityActivity.EXTRAMAIL);
 
-        // Create SharkEngine
-        sharkEngine = new AndroidSharkEngine(this);
-
         // Get AppDir
         File aDir = getFilesDir();
-        appDir = aDir.getPath() + "/";
+        appDir = aDir.getPath() + "/" + KBPATH;
 
-
-
+        // Create Wifipeer
+        wifiPeer = new WifiPeer(appDir, KBNAME, nickName, email, "", this);
         try {
-
-
-            // Create Knowledgebase
-            kb = new FSSharkKB(appDir + KBNAME);
-          
-            // Create own peertag
-            ownPeerTag = kb.createPeerSemanticTag(nickName, email, "AdressPlaceHolder");
-
-            STSet addContactsTopic = kb.createInMemoSTSet();
-            addContactsTopic.createSemanticTag(T_ADD_CONTACTS, "http://blub.de");
-            Interest addContactInterest = kb.createInterest(addContactsTopic, ownPeerTag, null ,null, null, null, SharkCS.DIRECTION_INOUT);
-
-
-            wifiKP = new WifiListenerKp(sharkEngine, kb.getPeerSemanticTag("myIdentity"), kb);
-            wifiKP.setConnectionListener(this);
-
-
-
+            wifiPeer.init();
         } catch (SharkKBException e) {
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            e.printStackTrace();
         }
 
-
-
-
-
     }
 
-
-
-    @Override
-    public void onConnectionEstablished(KEPConnection connection) {
-        Toast.makeText(this, "Connection established", Toast.LENGTH_LONG).show();
-       /* try {
-            connection.expose(wifiKP.getInterest());
-        } catch (SharkException e) {
-            e.printStackTrace();
-        }*/
-    }
 
 
 
@@ -151,9 +134,6 @@ public class MainActivity extends AppCompatActivity
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, contactFragment)
                         .commit();
-
-
-
                 break;
 
             // Messages
@@ -220,22 +200,39 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    public SharkEngine getSharkEngine() {
-        return sharkEngine;
+    public WifiPeer getWifiPeer() {
+        return wifiPeer;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        sharkEngine.stop();
+        wifiPeer.stopWifi();
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onPause() {
+        super.onPause();
+        wifiPeer.stopWifi();
+    }
 
+    public static synchronized void log(String text, final int logType) {
+        final String logText = text;
+        handler.post(new Runnable() {
+            public void run() {
+                if (logType == KbTextViewWriter.LOG_CON) {
+                    KbTextViewWriter.getInstance().appendToLogText(logText);
+                }
+                else if (logType == KbTextViewWriter.LOG_KB) {
+                    KbTextViewWriter.getInstance().appendToKbText(logText);
+                }
 
+            }
+        });
+    }
 
+    public KbTextViewWriter getLogger() {
+        return logger;
     }
 }
 

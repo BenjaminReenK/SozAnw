@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+
+        <!-- From Label -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/msgFrom"
+            android:id="@+id/tv_msg_from"
+            android:layout_weight="0.75"
+            android:textStyle="bold" />
+        <!-- Sender Name -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/msgName"
+            android:id="@+id/tv_msg_name"
+            android:layout_weight="2"
+            />
+        <!-- Message Date -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/msgDate"
+            android:id="@+id/tv_msg_date"
+            android:layout_weight="1"
+            android:textStyle="italic" />
+
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        >
+
+        <!-- Subject Label -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/msgSubjectLabel"
+            android:id="@+id/tv_msg_subjectlabel"
+            android:layout_weight="0.5"
+            android:textStyle="bold" />
+        <!-- Subject -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/msgSubject"
+            android:id="@+id/tv_msg_subject"
+            android:layout_weight="2"
+            />
+    </LinearLayout>
+
+
+
+</LinearLayout>

@@ -3,10 +3,42 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="messages"
-        android:id="@+id/textView2" />
+        android:descendantFocusability="blocksDescendants"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/msgCount"
+            android:id="@+id/tv_msg_count"
+            android:layout_weight="2.5"
+            android:textSize="33sp"
+            android:layout_marginLeft="30dp"/>
+
+        <ImageButton
+            android:layout_width="76dp"
+            android:layout_height="72dp"
+            android:id="@+id/btn_newmsg"
+            android:src="@drawable/new85"
+            android:background="#0000"/>
+
+    </LinearLayout>
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@android:color/darker_gray"/>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/lv_msglist"
+        android:layout_gravity="center_horizontal" />
 </LinearLayout>

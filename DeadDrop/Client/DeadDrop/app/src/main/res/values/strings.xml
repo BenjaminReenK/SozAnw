@@ -23,5 +23,17 @@
     <string name="contactsName">Name:</string>
     <string name="contactsFingerprint">Fingerprint:</string>
 
+    <string name="logCon">Connection</string>
+    <string name="logKB">KB</string>
+    <string name="logAll">All</string>
 
+    <string name="msgFrom">From:</string>
+    <string name="msgName">Name Value</string>
+    <string name="msgDate">Date Value</string>
+    <string name="msgSubjectLabel">Subject:</string>
+    <string name="msgSubject">Subject Value</string>
+    <string name="msgCount">0 Message(s)</string>
+    <string name="msgTo">To:</string>
+    <string name="msgVia">Via:</string>
+    <string name="msgSend">Send</string>
 </resources>

@@ -3,10 +3,44 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:descendantFocusability="blocksDescendants"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/logCon"
+            android:id="@+id/btn_log_con"
+            android:layout_weight="1.1" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/logKB"
+            android:id="@+id/btn_log_kb"
+            android:layout_weight="1"/>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/logAll"
+            android:id="@+id/btn_log_all"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+
+
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="log"
+        android:inputType="textMultiLine"
+        android:maxLines="9999"
+        android:scrollbars="vertical"
         android:id="@+id/tv_log" />
 </LinearLayout>

@@ -23,7 +23,7 @@ import java.util.ArrayList;
 public class ContactsFragment extends Fragment implements View.OnClickListener{
 
     MainActivity activity;
-    SharkEngine se;
+    WifiPeer wPeer;
     ContactListAdapter cAdapter;
 
 
@@ -41,7 +41,7 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
 
         ArrayList<String> tmp = new ArrayList<>();
         tmp.add("test");
-        cAdapter = new ContactListAdapter(activity, tmp);
+        cAdapter = new ContactListAdapter(getContext(), tmp);
         ListView lvContacts = (ListView) view.findViewById(R.id.lv_contacts);
         lvContacts.setAdapter(cAdapter);
         cAdapter.notifyDataSetChanged();
@@ -52,17 +52,9 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btn_addcontact) {
-            se = activity.getSharkEngine();
-            if (se != null) {
-
-                try {
-                    se.startWifiDirect();
-                } catch (SharkProtocolNotSupportedException e) {
-                    Toast.makeText(activity, "Wifi direct start error", Toast.LENGTH_LONG).show();
-                } catch (IOException e) {
-                    Toast.makeText(activity, "Wifi direct start error", Toast.LENGTH_LONG).show();
-                }
-                Toast.makeText(activity, "Wifi direct started", Toast.LENGTH_LONG).show();
+            wPeer = activity.getWifiPeer();
+            if (wPeer != null) {
+                wPeer.startWifi();
             }
 
         }
