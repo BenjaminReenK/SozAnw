@@ -39,7 +39,6 @@ public class MessagesFragment extends Fragment implements View.OnClickListener {
         main = (MainActivity) getActivity();
 
         return view;
-
     }
 
     @Override
@@ -48,6 +47,5 @@ public class MessagesFragment extends Fragment implements View.OnClickListener {
         FragmentManager fragmentManager = main.getSupportFragmentManager();
         NewMessageFragment newMessageFragment = new NewMessageFragment();
         fragmentManager.beginTransaction().replace(R.id.container, newMessageFragment).commit();
-
     }
 }

@@ -116,6 +116,12 @@ public class KbTextViewWriter implements KnowledgeBaseListener {
         outputTextView.setText(merged);
     }
 
+    public void clearAll() {
+        logText = "";
+        kbText = "";
+        //showAllText();
+    }
+
     @Override
     public void topicAdded(SemanticTag semanticTag) {
         try {

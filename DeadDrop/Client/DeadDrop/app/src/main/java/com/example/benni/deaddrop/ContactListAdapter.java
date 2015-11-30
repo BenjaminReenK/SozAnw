@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Benni on 27.11.2015.
+ * Fills ListView in ContactsFragment
  */
 public class ContactListAdapter extends ArrayAdapter<String> {
 

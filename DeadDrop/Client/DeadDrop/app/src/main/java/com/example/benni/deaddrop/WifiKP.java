@@ -54,21 +54,18 @@ public class WifiKP extends KnowledgePort {
         super(se);
 
         this.kb = kb;
+        SharkCS listenerInterest = new InMemoSharkKB().createInterest(null, null, null, null, null, null, SharkCS.DIRECTION_INOUT);
         this.myInterest = new InMemoSharkKB().createInterest(null, myIdentity, null, null, null, null, SharkCS.DIRECTION_INOUT);
-        //this.myInterest = getInterest();
+        setInterest(listenerInterest);
 
-       /* STSet topics = InMemoSharkKB.createInMemoSTSet();
-        SemanticTag contactReq = InMemoSharkKB.createInMemoSemanticTag("stname", MainActivity.T_ADD_CONTACTS);
-        topics.merge(contactReq);
-        contactInterest = new InMemoSharkKB().createInterest(topics, myIdentity, null, null, null, null, SharkCS.DIRECTION_INOUT);*/
     }
 
     @Override
     protected void doInsert(Knowledge knowledge, KEPConnection kepConnection) {
-        System.out.print("Knowledge received: (");
-        System.out.println(L.knowledge2String(knowledge));
-        L.knowledge2String(knowledge);
 
+        L.knowledge2String(knowledge);
+        MainActivity.log("knowledge received " + L.contextSpace2String(interest), KbTextViewWriter.LOG_CON);
+        MainActivity.log("knowledge: " + L.knowledge2String(knowledge), KbTextViewWriter.LOG_CON);
     }
 
     @Override
@@ -76,6 +73,7 @@ public class WifiKP extends KnowledgePort {
 
 
         MainActivity.log("interest received " + L.contextSpace2String(interest), KbTextViewWriter.LOG_CON);
+        connectionListener.onConnectionEstablished(kepConnection);
         if (isAnyInterest(interest)) {
             Log.d("WifiKp", "any interest");
             MainActivity.log("any interest received " + L.contextSpace2String(interest), KbTextViewWriter.LOG_CON);
@@ -88,13 +86,18 @@ public class WifiKP extends KnowledgePort {
                 MainActivity.log("WifiListenerKp - problems:" + ex.getMessage(), KbTextViewWriter.LOG_CON);
             }
         }
-        if (isPeerInterest(interest)){
+        if (isPeerInterest(interest)) {
             MainActivity.log("Peer interest received " + L.contextSpace2String(interest), KbTextViewWriter.LOG_CON);
-            connectionListener.onConnectionEstablished(kepConnection);
+
         }
-        else if (isContactInterest(interest)) {
+
+        /*if (!interest.isAny(SharkCS.DIM_TOPIC)) {
+
+            if (isContactInterest(interest)) {
+
+            }
             MainActivity.log("contact interest received " + L.contextSpace2String(interest), KbTextViewWriter.LOG_CON);
-        }
+        }*/
 
     }
 
@@ -118,21 +121,16 @@ public class WifiKP extends KnowledgePort {
     }
 
     private boolean isContactInterest(SharkCS theInterest) {
+        /*
         STSet topics = null;
         try {
             topics = theInterest.getSTSet(0);
-            //SemanticTag blub = topics.getSemanticTag(MainActivity.T_ADD_CONTACTS);
-            //String[] blub1 = blub.getSI();
+            SemanticTag blub = topics.getSemanticTag(CONTACTREQ_TOPIC_SI);
+            String[] blub1 = blub.getSI();
         } catch (SharkKBException e) {
             e.printStackTrace();
-        }
+        }*/
 
-
-/*
-        return (theInterest.getTopics(SharkCS.DIM_TOPIC) && !theInterest.isAny(SharkCS.DIM_ORIGINATOR) &&
-                theInterest.isAny(SharkCS.DIM_LOCATION) && theInterest.isAny(SharkCS.DIM_DIRECTION) &&
-                theInterest.isAny(SharkCS.DIM_PEER) && theInterest.isAny(SharkCS.DIM_REMOTEPEER) &&
-                theInterest.isAny(SharkCS.DIM_TIME)) ;*/
         return false;
     }
 }

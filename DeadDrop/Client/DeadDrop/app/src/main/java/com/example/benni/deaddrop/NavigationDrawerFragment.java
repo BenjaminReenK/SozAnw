@@ -248,11 +248,18 @@ public class NavigationDrawerFragment extends Fragment {
             return true;
         }
 
-        /*
-        if (item.getItemId() == R.id.action_example) {
-            Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT).show();
+        // Toggle Wifi Button
+        if (item.getItemId() == R.id.toggle_wifi) {
+            MainActivity main = (MainActivity) getActivity();
+            WifiPeer peer = main.getWifiPeer();
+            if (peer.isWifiRunning())
+                peer.stopWifi();
+            else
+                peer.startWifi();
+
+
             return true;
-        }*/
+        }
 
         return super.onOptionsItemSelected(item);
     }

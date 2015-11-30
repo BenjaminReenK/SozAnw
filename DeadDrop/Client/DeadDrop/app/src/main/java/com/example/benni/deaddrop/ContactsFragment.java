@@ -26,8 +26,6 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
     WifiPeer wPeer;
     ContactListAdapter cAdapter;
 
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -54,7 +52,8 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
         if (v.getId() == R.id.btn_addcontact) {
             wPeer = activity.getWifiPeer();
             if (wPeer != null) {
-                wPeer.startWifi();
+                Toast.makeText(activity, "Sending ContactRequest", Toast.LENGTH_SHORT).show();
+                wPeer.sendContactRequest();
             }
 
         }

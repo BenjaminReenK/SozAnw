@@ -87,6 +87,10 @@ public class MainActivity extends AppCompatActivity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
+        logger = KbTextViewWriter.getInstance();
+
+
+
         // handler for logging function
         handler = new Handler(Looper.getMainLooper()) {
             @Override
@@ -95,8 +99,6 @@ public class MainActivity extends AppCompatActivity
                 logger.appendToKbText((String) inputMsg.obj);
             }
         };
-
-        logger = KbTextViewWriter.getInstance();
 
         // extract Username and mail for Peer
         Intent intent = getIntent();
@@ -107,8 +109,8 @@ public class MainActivity extends AppCompatActivity
         File aDir = getFilesDir();
         appDir = aDir.getPath() + "/" + KBPATH;
 
-        // Create Wifipeer
-        wifiPeer = new WifiPeer(appDir, KBNAME, nickName, email, "", this);
+        // Create Wifipeer, Address is just a Placeholder, won't get used
+        wifiPeer = new WifiPeer(appDir, KBNAME, nickName, email, "tcp://127.0.0.1:1234", this);
         try {
             wifiPeer.init();
         } catch (SharkKBException e) {
@@ -118,12 +120,8 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-
-
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-
-
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
         switch (position) {
@@ -208,12 +206,14 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         wifiPeer.stopWifi();
+        logger.clearAll();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         wifiPeer.stopWifi();
+        logger.clearAll();
     }
 
     public static synchronized void log(String text, final int logType) {

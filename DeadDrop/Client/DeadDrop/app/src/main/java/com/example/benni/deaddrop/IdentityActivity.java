@@ -40,11 +40,6 @@ public class IdentityActivity extends AppCompatActivity implements View.OnClickL
         prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         previouslyStarted = prefs.getBoolean(FIRSTRUN, false);
 
-/*
-        SharedPreferences.Editor edit = prefs.edit();
-        edit.putBoolean(FIRSTRUN, false);
-        edit.commit();*/
-
         // first start
         if(!previouslyStarted) {
             SharedPreferences.Editor edit = prefs.edit();
