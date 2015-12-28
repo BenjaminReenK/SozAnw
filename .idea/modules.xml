@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Cryptotest/Cryptotest.iml" filepath="$PROJECT_DIR$/Cryptotest/Cryptotest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/EncryptedKB/EncryptedKB.iml" filepath="$PROJECT_DIR$/EncryptedKB/EncryptedKB.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Routing/Routing.iml" filepath="$PROJECT_DIR$/Routing/Routing.iml" />
+      <module fileurl="file://$PROJECT_DIR$/DeadDrop/Client/DeadDrop/app/src/androidTest/androidTest.iml" filepath="$PROJECT_DIR$/DeadDrop/Client/DeadDrop/app/src/androidTest/androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/DeadDrop/Client/DeadDrop/app/src/main/main.iml" filepath="$PROJECT_DIR$/DeadDrop/Client/DeadDrop/app/src/main/main.iml" />
+    </modules>
+  </component>
+</project>
