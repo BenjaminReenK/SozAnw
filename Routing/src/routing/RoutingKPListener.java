@@ -14,5 +14,7 @@ import net.sharkfw.system.SharkException;
  * @author Benni
  */
 public interface RoutingKPListener {
-    public void messageReceived(String message, PeerSemanticTag sender) throws SharkException, IOException;
+    public void messageReceived(String message, PeerSemanticTag originator, PeerSemanticTag sender) throws SharkException, IOException;
+    
+    public void addedContact(RoutingPeer contact);
 }

@@ -18,6 +18,6 @@ public interface RoutingInterface {
     public void sendMessage(PeerSemanticTag sender, PeerSemanticTag reciever, String message, int ttl, int hops) throws SharkException, IOException;
 
     //same as sendMsg just vice versa
-    public void recieveMessage(PeerSemanticTag sender, PeerSemanticTag reciever, String message, int ttl, long msgTime, int hops) throws SharkException, IOException;
+    public void recieveMessage(PeerSemanticTag originator, PeerSemanticTag sender, PeerSemanticTag reciever, String message, int ttl, long msgTime, int hops) throws SharkException, IOException;
 }
 
