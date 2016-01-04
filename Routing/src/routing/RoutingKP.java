@@ -178,31 +178,33 @@ public class RoutingKP extends KnowledgePort implements RoutingInterface{
                 null,
                 null,
                 SharkCS.DIRECTION_OUT);
-        // check if we have a contextpoint for these context coordinates
-        ContextPoint p = this.kb.getContextPoint(cc);
-        if (p != null) {
-            System.out.println("cp found - KP Owner: " + this.owner.getName());
-            Iterator<Information> infoIter = p.getInformation();
-            // extract msg informations from found context point
-            if(infoIter != null) {
-                String cpMsg;
-                long cpMsgTime;
-                // message content
-                cpMsg = infoIter.next().getContentAsString();
-                // skip ttl
-                infoIter.next();
-                // skip hops
-                infoIter.next();
-                // message creation time
-                cpMsgTime = Long.valueOf(infoIter.next().getContentAsString());
-                // message content and time are equal, so it's "safe" to say we already stored this msg
-                if (cpMsg.equals(message) && cpMsgTime == msgTime) {
-                    System.out.println("Already processed this msg - abort forwarding");
-                    return;
+        // check if we have one or more contextpoints for these context coordinates
+        Enumeration<ContextPoint> enumCP = this.kb.getContextPoints(cc);
+        if (enumCP != null) {
+            while (enumCP.hasMoreElements()) {
+                ContextPoint p = enumCP.nextElement();
+                Iterator<Information> infoIter = p.getInformation();
+                // extract msg informations from found context point
+                if(infoIter != null) {
+                    String cpMsg;
+                    long cpMsgTime;
+                    // message content
+                    cpMsg = infoIter.next().getContentAsString();
+                    // skip ttl
+                    infoIter.next();
+                    // skip hops
+                    infoIter.next();
+                    // message creation time
+                    cpMsgTime = Long.valueOf(infoIter.next().getContentAsString());
+                    // message content and time are equal, so it's "safe" to say we already stored this msg
+                    if (cpMsg.equals(message) && cpMsgTime == msgTime) {
+                        System.out.println("Already processed this msg - abort forwarding");
+                        return;
+                    }
                 }
             }
         }
-               
+                     
         // ttl exceeded - abort
         if (timeDiff > ttl) {
             System.out.println("ttl exceeded");
@@ -225,27 +227,6 @@ public class RoutingKP extends KnowledgePort implements RoutingInterface{
         this.listener = listener;
     }
     
-    /*
-    // add a single peer contact
-    public void addPeerContact(PeerSemanticTag p) {
-        this.contactList.add(p);
-    }
-    // delete a single peer contact
-    public void delPeerContact(PeerSemanticTag p) {
-        this.contactList.remove(p);
-    }
-    // add multiple peer contacts
-    public void addPeers(PeerSTSet peers) {
-        Enumeration<PeerSemanticTag> enumPeers = peers.peerTags();
-        while (enumPeers.hasMoreElements()) {
-            PeerSemanticTag tempPeer = enumPeers.nextElement();
-            // don't add own peertag to contactlist
-            if (!tempPeer.getSI()[0].equals(this.owner.getSI()[0])) {
-                this.contactList.add(tempPeer);
-            }
-        }
-    }
-    */
     // add a single peer contact
     public void addPeerContact(RoutingPeer p) {
         this.contactList.add(p);
@@ -260,6 +241,7 @@ public class RoutingKP extends KnowledgePort implements RoutingInterface{
         
         for (int i = 0; i < peers.size(); i++) {
             PeerSemanticTag tempPeer = peers.get(i).getOwnPeerTag();
+            // don't add own peer tag, to prevent message loop
             if (!tempPeer.getSI()[0].equals(this.owner.getSI()[0])) {
                 this.contactList.add(peers.get(i));
                 this.listener.addedContact(peers.get(i));

@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.sharkfw.kep.SharkProtocolNotSupportedException;
 import net.sharkfw.knowledgeBase.SharkKBException;
 import net.sharkfw.system.SharkException;
@@ -48,7 +50,6 @@ public class Main {
         erica.routingKP.addPeers(peers);
         
         alice.routingKP.sendMessage(alice.getOwnPeerTag(), erica.getOwnPeerTag(), "hallo", RoutingKP.TTL_HOUR, RoutingKP.MAX_HOPS);
-        
         
     }
 }
