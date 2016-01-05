@@ -61,8 +61,8 @@ public class RoutingKP extends KnowledgePort implements RoutingInterface{
         this.contactList = new ArrayList<>();
         this.ttlScheduler = new Timer();
         this.ttlCheck = new TTLCheck(this.kb);
-        // delay start for 1sec, check ttl for every message every minute
-        this.ttlScheduler.schedule(ttlCheck, 1000, 60000);
+        // delay start for 10sec, check ttl for every message every minute
+        this.ttlScheduler.schedule(ttlCheck, 10000, 60000);
     }
     
     @Override
@@ -144,9 +144,15 @@ public class RoutingKP extends KnowledgePort implements RoutingInterface{
         Knowledge k = this.kb.createKnowledge();
         // add our context point with all the message informations
         k.addContextPoint(cp);
-        // send knowledge to all known contacts
-        for (int i = 0; i < this.contactList.size(); i++) {
-            this.sendKnowledge(k, this.contactList.get(i).getOwnPeerTag());
+        // check if we know the receiver, if yes, send msg only to this one
+        if (isContactInList(reciever)) {
+            this.sendKnowledge(k, reciever);
+        }
+        // send knowledge to all known contacts if reciever is unknown
+        else {
+            for (int i = 0; i < this.contactList.size(); i++) {
+                this.sendKnowledge(k, this.contactList.get(i).getOwnPeerTag());
+            }  
         }
     }
 
@@ -254,4 +260,17 @@ public class RoutingKP extends KnowledgePort implements RoutingInterface{
             }
         }
     }
+    
+    private boolean isContactInList(PeerSemanticTag p) {
+        boolean result = false;
+        for (int i = 0; i < this.contactList.size(); i++) {
+            if (this.contactList.get(i).getOwnPeerTag().getSI()[0].equals(p.getSI()[0])) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+    
+   
 }
