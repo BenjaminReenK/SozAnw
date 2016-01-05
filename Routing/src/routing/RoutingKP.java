@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sharkfw.knowledgeBase.ContextCoordinates;
@@ -48,6 +49,8 @@ public class RoutingKP extends KnowledgePort implements RoutingInterface{
     private RoutingKPListener listener = null;
     // every peer / kp needs a "contactlist" to forward the received msg
     private ArrayList<RoutingPeer> contactList = null;
+    private Timer ttlScheduler = null;
+    private TTLCheck ttlCheck = null;
     
     public RoutingKP(SharkEngine se, PeerSemanticTag owner, SharkKB kb) {
         super(se);
@@ -56,7 +59,10 @@ public class RoutingKP extends KnowledgePort implements RoutingInterface{
         this.kb.setOwner(owner);
         this.routingTopic = InMemoSharkKB.createInMemoSemanticTag("RoutingTopic", RoutingKP.ROUTING_TOPIC_SI);
         this.contactList = new ArrayList<>();
-       
+        this.ttlScheduler = new Timer();
+        this.ttlCheck = new TTLCheck(this.kb);
+        // delay start for 1sec, check ttl for every message every minute
+        this.ttlScheduler.schedule(ttlCheck, 1000, 60000);
     }
     
     @Override
