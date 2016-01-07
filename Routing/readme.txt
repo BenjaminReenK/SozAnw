@@ -9,7 +9,8 @@ public void sendMessage(PeerSemanticTag sender, PeerSemanticTag receiver, byte[]
 The user can choose which one he wants to use. If you just want to send a simple message, you can use the first one. If
 you want to encrypt the message before sending, you should use the second one. 
 
-Note: Encryption have to be implemented on your own! For a simple encryption test, a XOR method was implemented.
+Note: In case you need end2end encryption, you have to do it on your own! The current version only supports session encryption 
+using the ShawkFW encryption. For an end2end encryption test, a simple XOR method was implemented.
 
 How does this routing work?
 
