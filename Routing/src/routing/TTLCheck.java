@@ -8,8 +8,6 @@ package routing;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.sharkfw.knowledgeBase.ContextCoordinates;
 import net.sharkfw.knowledgeBase.ContextPoint;
 import net.sharkfw.knowledgeBase.Information;
@@ -21,7 +19,9 @@ import net.sharkfw.knowledgeBase.inmemory.InMemoSharkKB;
 
 /**
  *
- * @author Benni
+ * @author @author s0546862 / s0546935
+ * This Class checks for old messages in our KnowledgeBase. 
+ * If they TTL is exceeded, the message gets removed.
  */
 public class TTLCheck extends TimerTask{
 
@@ -51,6 +51,7 @@ public class TTLCheck extends TimerTask{
             System.out.println(ex);
         }
         if (enumCP != null) {
+            // check all found contextpoints
             while (enumCP.hasMoreElements()) {
                 ContextPoint p = enumCP.nextElement();
                 Iterator<Information> infoIter = p.getInformation();
@@ -59,6 +60,10 @@ public class TTLCheck extends TimerTask{
                     try {
                         long cpMsgTime, timediff, now;
                         int cpTTL;
+                        // skip msg id
+                        infoIter.next();
+                        // skip content type
+                        infoIter.next();
                         // skip msg content
                         infoIter.next();
                         // ttl
