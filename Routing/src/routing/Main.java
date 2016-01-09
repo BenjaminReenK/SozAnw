@@ -61,7 +61,7 @@ public class Main {
         byte[] encrypted = xor(msg.getBytes(), key.getBytes());
         // send "encrypted" byte[] message
         alice.routingKP.sendMessage(alice.getOwnPeerTag(), erica.getOwnPeerTag(), encrypted, RoutingKP.TTL_HOUR, RoutingKP.MAX_HOPS);
-        */      
+        */   
     }
     
     public static byte[] xor(byte[] a, byte[] b) {

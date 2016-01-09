@@ -101,23 +101,24 @@ public class RoutingKP extends KnowledgePort implements RoutingInterface{
                     String msg = "";
                     byte[] msgContent = null;
                     String msgID = infoIter.next().getContentAsString();
+                    // store content as Information, so we don't need 2 seperate received methods
+                    Information content = new MessageInformation();
                     int contentType = Integer.valueOf(infoIter.next().getContentAsString());
+                    content.setContentType(String.valueOf(contentType));
                     // extract msg content, depending on content type
                     if (contentType == CONTENT_STRING) {
                         msg = infoIter.next().getContentAsString();
+                        content.setContent(msg);
                     } else if (contentType == CONTENT_BYTE) {
                         msgContent = infoIter.next().getContentAsByte();
+                        content.setContent(msgContent);
                     }
                     // extract ttl and some other stuff
                     int ttl = Integer.valueOf(infoIter.next().getContentAsString());
                     int hops = Integer.valueOf(infoIter.next().getContentAsString());
                     long time = Long.valueOf(infoIter.next().getContentAsString());
-                    // process this msg
-                    if (contentType == CONTENT_STRING) {
-                        this.receivedMessage(originator, sender, receiver, msg, ttl, time, hops, msgID);
-                    } else if (contentType == CONTENT_BYTE) {
-                        this.receivedMessage(originator, sender, receiver, msgContent, ttl, time, hops, msgID);
-                    }
+                    this.receivedMessage(originator, sender, receiver, content, ttl, time, hops, msgID);
+                  
                 } catch (SharkKBException ex) {
                     Logger.getLogger(RoutingKP.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SharkException ex) {
@@ -144,7 +145,10 @@ public class RoutingKP extends KnowledgePort implements RoutingInterface{
         // create unique message id from originator SI, timestamp and random number, in case
         // someone achieves it to send more than one message in 1 msec
         String msgID = sender.getSI()[0] + now + RoutingPeer.randInt(1, 10000);
-        forwardMessage(sender, receiver, message, ttl, now, hops, msgID);
+        Information messageContent = new MessageInformation();
+        messageContent.setContentType(String.valueOf(CONTENT_STRING));
+        messageContent.setContent(message);
+        forwardMessage(sender, receiver, messageContent, ttl, now, hops, msgID);
     }
     
     // used for initial msg sending, set msgtime to "now"
@@ -155,13 +159,16 @@ public class RoutingKP extends KnowledgePort implements RoutingInterface{
         // create unique message id from originator SI, timestamp and random number, in case
         // someone achieves it to send more than one message in 1 msec
         String msgID = sender.getSI()[0] + now + RoutingPeer.randInt(1, 10000);
-        forwardMessage(sender, receiver, message, ttl, now, hops, msgID);
+        Information messageContent = new MessageInformation();
+        messageContent.setContentType(String.valueOf(CONTENT_BYTE));
+        messageContent.setContent(message);
+        forwardMessage(sender, receiver, messageContent, ttl, now, hops, msgID);
     }
     
     
     // similiar to sendMessage, just using original msgTime as parameter for ttl handling
     // and seperate originator / sender
-    private void forwardMessage(PeerSemanticTag originator, PeerSemanticTag receiver, String message, int ttl, long msgTime, int hops, String msgID) throws SharkException, IOException{
+    private void forwardMessage(PeerSemanticTag originator, PeerSemanticTag receiver, Information message, int ttl, long msgTime, int hops, String msgID) throws SharkException, IOException{
         
         // Creating context coordinates in kb
         ContextCoordinates cc = this.kb.createContextCoordinates(
@@ -184,9 +191,14 @@ public class RoutingKP extends KnowledgePort implements RoutingInterface{
         // add msgid
         cp.addInformation(msgID);
         // add contentType
-        cp.addInformation(Integer.toString(CONTENT_STRING));
+        cp.addInformation(message.getContentType());
         // add message
-        cp.addInformation(message);
+        if (Integer.valueOf(message.getContentType()) == CONTENT_STRING) {
+            cp.addInformation(message.getContentAsString());
+        }
+        else if (Integer.valueOf(message.getContentType()) == CONTENT_BYTE) {
+            cp.addInformation(message.getContentAsByte());
+        }
         // add ttl
         cp.addInformation(Integer.toString(ttl));
         // add hops
@@ -209,61 +221,18 @@ public class RoutingKP extends KnowledgePort implements RoutingInterface{
         }
     }
     
-    // similiar to sendMessage, just using original msgTime as parameter for ttl handling
-    // and seperate originator / sender
-    private void forwardMessage(PeerSemanticTag originator, PeerSemanticTag receiver, byte[] message, int ttl, long msgTime, int hops, String msgID) throws SharkException, IOException{
-        
-        // Creating context coordinates in kb
-        ContextCoordinates cc = this.kb.createContextCoordinates(
-                routingTopic,
-                originator, // set originator of this msg
-                this.owner, // set this peer as sender
-                receiver, // set final reciever of this msg
-                null,
-                null,
-                SharkCS.DIRECTION_OUT);
-        // create context point for these context coordinates                
-        ContextPoint cp = this.kb.createContextPoint(cc);
-
-        /* not working atm, receiver doesn't get the knowledge.. don't know why
-        Information msgInfo = new MessageInformation();
-        msgInfo.setContent(message);
-        msgInfo.setName("msgcontent");
-        cp.addInformation(msgInfo);*/
-        
-        // add msgid
-        cp.addInformation(msgID);
-        // add contentType
-        cp.addInformation(Integer.toString(CONTENT_BYTE));
-        // add message
-        cp.addInformation(message);
-        // add ttl
-        cp.addInformation(Integer.toString(ttl));
-        // add hops
-        cp.addInformation(Integer.toString(hops));
-        // add message create time for ttl
-        cp.addInformation(Long.toString(msgTime));
-        // create the knowledge      
-        Knowledge k = this.kb.createKnowledge();
-        // add our context point with all the message informations
-        k.addContextPoint(cp);
-        // check if we know the receiver, if yes, send msg only to this one
-        if (isContactInList(receiver)) {
-            this.sendKnowledge(k, receiver);
-        }
-        // send knowledge to all known contacts if reciever is unknown
-        else {
-            for (int i = 0; i < this.contactList.size(); i++) {
-                this.sendKnowledge(k, this.contactList.get(i).getOwnPeerTag());
-            }  
-        }
-    }
 
     // called from doInsert() for further message processing
-    public void receivedMessage(PeerSemanticTag originator, PeerSemanticTag sender, PeerSemanticTag receiver, String message, int ttl,  long msgTime, int hops, String msgID) throws SharkException, IOException{
+    public void receivedMessage(PeerSemanticTag originator, PeerSemanticTag sender, PeerSemanticTag receiver, Information message, int ttl,  long msgTime, int hops, String msgID) throws SharkException, IOException{
         // notifiy listener about new message
         if (this.listener != null) {
-            this.listener.messageReceived(message, originator, sender);
+            if (Integer.valueOf(message.getContentType()) == CONTENT_STRING) {
+                this.listener.messageReceived(message.getContentAsString(), originator, sender);
+            }
+            else if (Integer.valueOf(message.getContentType()) == CONTENT_BYTE) {
+                this.listener.messageReceived(message.getContentAsByte(), originator, sender);
+            }
+            
         }
         // decrease hop count
         hops -= 1;
@@ -308,81 +277,6 @@ public class RoutingKP extends KnowledgePort implements RoutingInterface{
                     String cpMsgID = infoIter.next().getContentAsString();
                     // check if we already processed this msgid and we have no new contacts for msg spreading
                     if (cpMsgID.equals(msgID) && !this.freshContact) {
-                        System.out.println("Already processed this msg - abort forwarding");
-                        return;
-                    }
-                }
-            }
-        }
-                     
-        // ttl exceeded - abort
-        if (timeDiff > ttl) {
-            System.out.println("ttl exceeded");
-            return;
-        }
-        
-        System.out.println("------------------------");
-               
-        // spread msg to all known contacts if hop count allows it
-        if (hops > 0) {
-            forwardMessage(originator, receiver, message, ttl, msgTime, hops, msgID);
-        }
-        else {
-            System.out.println("Hop count too low - stop forwarding the msg");
-        }
-        // all message sending stuff is done, so reset freshcontact
-        this.freshContact = false;
-    }
-    
-    // called from doInsert() for further message processing
-    public void receivedMessage(PeerSemanticTag originator, PeerSemanticTag sender, PeerSemanticTag receiver, byte[] message, int ttl,  long msgTime, int hops, String msgID) throws SharkException, IOException{
-        // notifiy listener about new message
-        if (this.listener != null) {
-            this.listener.messageReceived(message, originator, sender);
-        }
-        // decrease hop count
-        hops -= 1;
-        // print out some msg informations
-        System.out.println("TTL: " + ttl);
-        System.out.println("Remaining Hops: " + hops);
-        System.out.println("Creation time: " + msgTime);
-        Date date = new Date(msgTime);
-        System.out.println(date);
-        // get current time in msec
-        long now = System.currentTimeMillis();
-        // timedifference between msg sending and receiving in msec
-        long timeDiff = now - (msgTime);
-        System.out.println("Current time: " + now);
-        System.out.println("timediff: " + timeDiff);
-        
-        // check if the msg is for this peer, if yes abort
-        if (SharkCSAlgebra.identical(receiver, this.owner))
-        {
-            System.out.println("msg reached the receiver - abort msg forwarding");
-            return;
-        }
-              
-        // check if we already processed this msg, temporary context coordinates
-        ContextCoordinates cc = InMemoSharkKB.createInMemoContextCoordinates(
-                routingTopic,
-                originator, // set originator of this msg
-                this.owner, // set this peer as sender
-                receiver, // set final reciever of this msg
-                null,
-                null,
-                SharkCS.DIRECTION_OUT);
-        // check if we have one or more contextpoints for these context coordinates
-        Enumeration<ContextPoint> enumCP = this.kb.getContextPoints(cc);
-        if (enumCP != null) {
-            while (enumCP.hasMoreElements()) {
-                ContextPoint p = enumCP.nextElement();
-                Iterator<Information> infoIter = p.getInformation();
-                // extract msg informations from found context point
-                if(infoIter != null) {
-                    // extract msgID
-                    String cpMsgID = infoIter.next().getContentAsString();
-                    // check if we already processed this msgid
-                    if (cpMsgID.equals(msgID)) {
                         System.out.println("Already processed this msg - abort forwarding");
                         return;
                     }
